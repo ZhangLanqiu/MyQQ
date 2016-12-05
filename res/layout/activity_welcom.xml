@@ -1,0 +1,16 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:background="@color/whites"
+    tools:context="com.lanqiu.myqq.activity.WelcomActivity" >
+
+    <ImageView
+        android:contentDescription="@string/app_name"
+        android:id="@+id/iv_welcome"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/skin_about_brand" />
+
+</RelativeLayout>
