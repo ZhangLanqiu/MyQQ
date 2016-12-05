@@ -60,7 +60,7 @@ public class LoginActivity extends Activity {
 						PreferencesUtil.putSharePre(context,
 								Constant.ACTION_MSG_IS_VIBRATE, true);
 						// 登陆成功后进入Mainactivity
-						startActivity(new Intent(context, Mainactivity.class));
+//						startActivity(new Intent(context, Mainactivity.class));
 						finish();
 
 					} else {// 登陆失败
