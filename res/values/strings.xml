@@ -110,5 +110,6 @@
     <string name="storage_warning">没有外部存储设备或SD卡不可用</string>
     <string name="wifi">文件管理</string>
     <string name="title_activity_login">LoginActivity</string>
+    <string name="title_activity_register">RegisterActivity</string>
 
 </resources>
