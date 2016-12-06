@@ -12,7 +12,7 @@ public class Constant {
 	 * openFire主机地址和端口号
 	 */
 	public static final String XMPP_HOST = "192.168.137.1";
-	public static final String XMPP_PORT = "5222";
+	public static final int XMPP_PORT = 5222;
 	
 	/**
 	 * 登陆状态的广播
