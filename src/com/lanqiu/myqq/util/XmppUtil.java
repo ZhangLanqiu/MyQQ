@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.jivesoftware.smack.Chat;
+import org.jivesoftware.smack.ChatManager;
 import org.jivesoftware.smack.PacketCollector;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
@@ -27,7 +29,11 @@ import org.jivesoftware.smackx.ReportedData.Row;
 import org.jivesoftware.smackx.search.UserSearchManager;
 
 import android.content.Context;
+import android.util.Log;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.lanqiu.myqq.activity.R;
 import com.lanqiu.myqq.bean.Session;
 
 /**
@@ -399,7 +405,7 @@ public class XmppUtil {
 			if (group != null) {
 				// 获取好友
 				RosterEntry entry = connection.getRoster().getEntry(userJid);
-				if (entry != null) 
+				if (entry != null)
 					group.removeEntry(entry);
 			}
 		} catch (XMPPException e) {
@@ -407,15 +413,123 @@ public class XmppUtil {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * 修改签名
+	 * 
 	 * @param connection
 	 * @param code
 	 * @param content
 	 */
-	public static void changeSign(XMPPConnection connection,int code , String content){  
-		
+	public static void changeSign(XMPPConnection connection, int code,
+			String content) {
+		// 获取用户状态
+		Presence presence = getOnlineStatus(code);
+		// 设置签名
+		presence.setStatus(content);
+		// 发送包
+		connection.sendPacket(presence);
+
+	}
+
+	/**
+	 * 发送消息
+	 * 
+	 * @param mXMPPConnection
+	 * @param content
+	 * @param touser
+	 * @throws XMPPException
+	 */
+	public static void sendMessage(XMPPConnection conn, String content,
+			String touser) throws XMPPException {
+		// 判断当前的链接状态如果连接为空或未连接则抛出异常
+		if (conn == null || !conn.isConnected()) {
+			throw new XMPPException();
+		}
+		// 获取聊天管理器
+		ChatManager chatManager = conn.getChatManager();
+		// 创建聊天
+		Chat chat = chatManager.createChat(touser + "@" + Constant.XMPP_HOST,
+				null);
+		// 如果chat不为空发送消息
+		if (chat != null) {
+			chat.sendMessage(content);
+			Log.e("lanqiu", "发送成功");
+		}
+	}
+
+	/**
+	 * 设置线上状态图
+	 * 
+	 * @param iv_stutas
+	 * @param code
+	 * @param tv_stutas
+	 * @param items
+	 */
+	public static void setOnlineStatus(ImageView iv_stutas, int code,
+			TextView tv_stutas, String[] items) {
+		// 判断状态码
+		switch (code) {
+		case 0://在线
+			iv_stutas.setImageResource(R.drawable.evk);
+			tv_stutas.setText(items[0]);
+			break;
+		case 1://q我吧
+			iv_stutas.setImageResource(R.drawable.evm);
+			tv_stutas.setText(items[1]);
+			break;
+		case 2://隐身
+			iv_stutas.setImageResource(R.drawable.evf);
+			tv_stutas.setText(items[2]);
+			break;
+		case 3://忙碌
+			iv_stutas.setImageResource(R.drawable.evd);
+			tv_stutas.setText(items[3]);
+			break;
+		case 4://离开
+			iv_stutas.setImageResource(R.drawable.evp);
+			tv_stutas.setText(items[4]);
+			break;
+
+		default:
+			break;
+		}
+	}
+
+	/**
+	 * 获取用户的状态
+	 * 
+	 * @param code
+	 * @return
+	 */
+	public static Presence getOnlineStatus(int code) {
+		Presence presence = null;
+		switch (code) {
+		case 0:
+			presence = new Presence(Presence.Type.available); // 在线
+			break;
+		case 1:
+			presence = new Presence(Presence.Type.available); // 设置Q我吧
+			presence.setMode(Presence.Mode.chat);
+			break;
+		case 2: // 隐身
+			presence = new Presence(Presence.Type.unavailable);
+			break;
+		case 3:
+			presence = new Presence(Presence.Type.available); // 设置忙碌
+			presence.setMode(Presence.Mode.dnd);
+			break;
+		case 4:
+			presence = new Presence(Presence.Type.available); // 设置离开
+			presence.setMode(Presence.Mode.away);
+			break;
+		case 5:
+			presence = new Presence(Presence.Type.unavailable); // 离线
+			break;
+		default:
+			break;
+		}
+		return presence;
 	}
 
 }
