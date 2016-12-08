@@ -79,13 +79,17 @@ public class XmppUtil {
 		collector.cancel();
 		// 解析来对返回的结果进行判断
 		if (result == null) {
+			Log.d("Registration", "服务器无结果！");
 			return 0;
 		} else if (result.getType() == IQ.Type.RESULT) {
+			Log.d("Registration", "注册成功！");
 			return 1;
 		} else {
 			if (result.getError().toString().equalsIgnoreCase("conflict(409)")) {
+				Log.d("Registration", "账号已经存在！");
 				return 2;
 			} else {
+				Log.d("Registration", "注册失败！");
 				return 3;
 			}
 		}

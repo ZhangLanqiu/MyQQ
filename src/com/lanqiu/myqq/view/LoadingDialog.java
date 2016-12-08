@@ -14,7 +14,7 @@ public class LoadingDialog extends Dialog {
 	private TextView tv;
 
 	public LoadingDialog(Context context) {
-		super(context);
+		super(context,R.style.Dialog_bocop);
 		init();
 	}
 
