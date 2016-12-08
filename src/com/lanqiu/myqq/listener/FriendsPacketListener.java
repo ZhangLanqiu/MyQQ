@@ -15,7 +15,7 @@ public class FriendsPacketListener implements PacketListener {
 	
 	@Override
 	public void processPacket(Packet arg0) {
-
+		///
 	}
 
 }
