@@ -111,5 +111,6 @@
     <string name="wifi">文件管理</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="title_activity_register">RegisterActivity</string>
+    <string name="title_activity_main">MainActivity</string>
 
 </resources>

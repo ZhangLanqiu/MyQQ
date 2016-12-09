@@ -48,5 +48,19 @@
         <item name="android:windowAnimationStyle">@+android:style/Animation.Dialog</item>
     </style>
     <!-- Loding_dialog样式End -->
+    
+    <!-- QQ -->
+    <style name="ButtomBar">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:padding">3dp</item>
+    </style>
+    <style name="ButtomBarImgBtn">
+        <item name="android:layout_height">60dp</item>
+        <item name="android:layout_width">60dp</item>
+        <item name="android:scaleType">fitXY</item>
+        <item name="android:layout_centerInParent">true</item>
+    </style>
 
 </resources>

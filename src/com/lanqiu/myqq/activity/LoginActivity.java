@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 
+import com.lanqiu.myqq.service.MsfService;
 import com.lanqiu.myqq.util.Constant;
 import com.lanqiu.myqq.util.PreferencesUtil;
 import com.lanqiu.myqq.util.ToastUtil;
@@ -137,7 +138,7 @@ public class LoginActivity extends Activity implements OnClickListener {
 
 		case R.id.register:// 注册逻辑
 			// 跳转到注册页面
-			// startActivities(new Intent(context,RegisterActivity.class));
+			 startActivity(new Intent(context,RegisterActivity.class));
 			break;
 		}
 
@@ -180,7 +181,7 @@ public class LoginActivity extends Activity implements OnClickListener {
 		//显示自定义Dialog
 		loadingDialog.show();
 		//接下来启动核心服务
-		
+		startService(new Intent(this,MsfService.class));
 	}
 	
 	@Override

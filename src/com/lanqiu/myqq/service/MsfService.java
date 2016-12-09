@@ -3,13 +3,24 @@ package com.lanqiu.myqq.service;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 
+import org.jivesoftware.smack.Chat;
+import org.jivesoftware.smack.ChatManager;
+import org.jivesoftware.smack.ChatManagerListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.filter.AndFilter;
+import org.jivesoftware.smack.filter.PacketFilter;
+import org.jivesoftware.smack.filter.PacketTypeFilter;
+import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smackx.workgroup.ext.history.ChatMetadata;
 
 import com.lanqiu.myqq.listener.CheckConnctionListener;
+import com.lanqiu.myqq.listener.FriendsPacketListener;
+import com.lanqiu.myqq.listener.MsgListener;
 import com.lanqiu.myqq.util.Constant;
 import com.lanqiu.myqq.util.PreferencesUtil;
 import com.lanqiu.myqq.util.XmppConnectionManager;
+import com.lanqiu.myqq.util.XmppUtil;
 
 import android.app.NotificationManager;
 import android.app.Service;
@@ -36,6 +47,7 @@ public class MsfService extends Service {
 	private XmppConnectionManager mXmppConnectionManager;
 	private XMPPConnection conn;
 	private CheckConnctionListener checkConnctionListener;
+	private FriendsPacketListener friendsPacketListener;
 
 	/*
 	 * 创建一个内部类继承Binder
@@ -110,7 +122,18 @@ public class MsfService extends Service {
 		conn = mXmppConnectionManager.init();
 		// 登陆到XMPP
 		loginXMPP();
+		// 获取聊天管理器
+		ChatManager chatManager = conn.getChatManager();
+		// 通过聊天管理器添加聊天的监听
+		chatManager.addChatListener(new ChatManagerListener() {
 
+			@Override
+			public void chatCreated(Chat chat, boolean arg1) {
+				// 通过chat添加一个消息监听处理各种类型的消息发送和接收
+				chat.addMessageListener(new MsgListener(MsfService.this,
+						mNotificationManager));
+			}
+		});
 	}
 
 	/**
@@ -129,27 +152,61 @@ public class MsfService extends Service {
 			}
 			// 进行登录
 			conn.login(mUsername, mPassword);
-			//判断用户是否已经验证
-			if(conn.isAuthenticated()){
+			// 判断用户是否已经验证
+			if (conn.isAuthenticated()) {
 				/*
-				 * 验证成功
-				 * 发送登陆成功广播
+				 * 验证成功 发送登陆成功广播
 				 */
 				sendLoginBroadcast(true);
+				// 创建XMPP连接监听并添加
+				checkConnctionListener = new CheckConnctionListener(this);
+				conn.addConnectionListener(checkConnctionListener);
+				// 注册好友状态监听
+				friendsPacketListener = new FriendsPacketListener(this);
+				// 数据包过滤
+				PacketFilter filter = new AndFilter(new PacketTypeFilter(
+						Presence.class));
+				// 添加好友状态更新监听
+				conn.addPacketListener(friendsPacketListener, filter);
+				// 更改用户状态
+				XmppUtil.setPresence(this, conn,
+						PreferencesUtil.getSharePreInt(this, "online_status"));
 			}
 		} catch (XMPPException e) {
-			// TODO Auto-generated catch block
+			// 登陆失败发送登陆失败广播，并自动销毁服务
+			sendLoginBroadcast(false);
+			stopSelf();
 			e.printStackTrace();
 		}
 	}
 
 	/**
 	 * 发送登陆状态广播
+	 * 
 	 * @param b
 	 */
 	private void sendLoginBroadcast(boolean isLoginSuccess) {
 		Intent intent = new Intent(Constant.ACTION_IS_LOGIN_SUCCESS);
 		intent.putExtra("isLoginSuccess", isLoginSuccess);
 		sendBroadcast(intent);
+	}
+
+	@Override
+	public void onDestroy() {
+		try {
+			if (mNotificationManager != null) {
+				if (conn != null) {
+					conn.disconnect();
+					conn = null;
+				}
+
+				if (mXmppConnectionManager != null) {
+					mXmppConnectionManager = null;
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		super.onDestroy();
 	}
 }
